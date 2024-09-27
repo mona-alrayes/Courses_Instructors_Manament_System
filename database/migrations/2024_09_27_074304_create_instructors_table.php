@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('experience')->default(0);
             $table->string('specialty');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
