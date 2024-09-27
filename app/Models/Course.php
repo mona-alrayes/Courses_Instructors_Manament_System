@@ -20,6 +20,7 @@ class Course extends Model
         'start_date' => 'date',
     ];
 
+
     public function instructors(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Instructor::class);

@@ -11,17 +11,20 @@ class InstructorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
-        //
+        $instructors = Instructor::all();
+        return self::success($instructors , 'instructors retrieved successfully');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInstructorRequest $request)
+    public function store(StoreInstructorRequest $request): \Illuminate\Http\JsonResponse
     {
-        //
+        $data = $request->validated();
+        $instructor = Instructor::create($data);
+        return self::success($instructor, 'instructor created successfully');
     }
 
     /**

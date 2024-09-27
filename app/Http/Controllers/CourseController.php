@@ -13,7 +13,10 @@ class CourseController extends Controller
      */
     public function index()
     {
-        //
+        $courses = Course::with(['instructors' => function($query) {
+            $query->select('id', 'name');
+        }])->get();
+        return self::success($courses, 'Courses retrieved successfully.');
     }
 
     /**
@@ -21,7 +24,11 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
-        //
+        $data = $request->validated();
+        $course=Course::create($data);
+        $course->instructors()->sync('instructors');
+        $course->load('instructors');
+        return self::success($course, 'Course created successfully.');
     }
 
     /**
