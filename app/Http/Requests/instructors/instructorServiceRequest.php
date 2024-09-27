@@ -25,6 +25,7 @@ class instructorServiceRequest extends FormRequest
             'name' => ['string', 'min:3', 'max:255'],
             'specialty' => ['string', 'min:3', 'max:255'],
             'experience' => ['integer', 'between:1,40'],
+            'course_id' => ['integer', 'exists:courses,id'],
         ];
 
         if ($this->isMethod('post')) {
@@ -32,11 +33,13 @@ class instructorServiceRequest extends FormRequest
             $rules['name'][] = 'required';
             $rules['specialty'][] = 'required';
             $rules['experience'][] = 'required';
+            $rules['course_id'][] = 'nullable';  // don't have to add course while making a new teacher
         } else if ($this->isMethod('put')) {
             // Allow optional fields for update request
             $rules['name'][] = 'sometimes';
             $rules['specialty'][] = 'sometimes';
             $rules['experience'][] = 'nullable';
+            $rules['course_id'][] = 'nullable';
         }
 
         return $rules;
@@ -53,7 +56,8 @@ class instructorServiceRequest extends FormRequest
             'max' => 'عدد محارف :attribute لا يجب أن يتجاوز :max محرفًا',
             'min' => 'حقل :attribute يجب أن يكون :min محارف على الأقل',
             'integer' => 'حقل :attribute يجب أن يكون رقماً',
-            'between' => 'عدد سنوات الخبرة يجب ان تكون :between  '
+            'between' => 'عدد سنوات الخبرة يجب ان تكون :between  ',
+            'exists' => 'حقل :attribute غير موجود في بياناتنا '
         ];
     }
 
@@ -66,6 +70,7 @@ class instructorServiceRequest extends FormRequest
             'name' => 'الاسم',
             'specialty' => 'الاختصاص',
             'experience' => 'سنوات الخبرة',
+            'course_id' => 'معرف الدورة'
         ];
     }
 
@@ -74,10 +79,12 @@ class instructorServiceRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'name' => ucwords(strtolower($this->input('name'))),
-            'specialty' => ucwords(strtolower($this->input('specialty'))),
-        ]);
+        if($this->input('name') || $this->input('specialty') !== null) {
+            $this->merge([
+                'name' => ucwords(strtolower($this->input('name'))),
+                'specialty' => ucwords(strtolower($this->input('specialty'))),
+            ]);
+        }
     }
 
     /**

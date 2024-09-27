@@ -5,32 +5,34 @@ namespace App\Http\Controllers;
 use App\Http\Requests\courses\StoreCourseRequest;
 use App\Http\Requests\courses\UpdateCourseRequest;
 use App\Models\Course;
+use App\Services\CoursesService;
 
 class CourseController extends Controller
 {
+    protected CoursesService $CoursesService;
+
+    public function __construct(CoursesService $CoursesService){
+        $this->CoursesService = $CoursesService;
+    }
+
     /**
      * Display a listing of the resource.
+     * @throws \Exception
      */
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $courses = Course::with(['instructors' => function($query) {
-            $query->select('instructors.id', 'name');  // I specified id that belongs to instructors so it doesn't make config in query since both courses and instructors have id
-        }])->get();
-        return self::success($courses, 'Courses retrieved successfully.');
+       $courses = $this->CoursesService->getCourses();
+        return self::paginated($courses, 'Courses retrieved successfully.', 200);
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws \Exception
      */
-    public function store(StoreCourseRequest $request)
+    public function store(StoreCourseRequest $request): \Illuminate\Http\JsonResponse
     {
-        $data = $request->validated();
-        $course=Course::create($data);
-        if(isset($request->instructor_id)) {
-            $course->instructors()->sync($request->instructor_id);
-        }
-        $course->load('instructors');
-        return self::success($course, 'Course created successfully.');
+       $course= $this->CoursesService->storeCourse($request);
+        return self::success($course, 'Course created successfully.', 201);
     }
 
     /**
@@ -38,7 +40,7 @@ class CourseController extends Controller
      */
     public function show(Course $course): \Illuminate\Http\JsonResponse
     {
-        return self::success($course->load('instructors'), 'Course retrieved successfully.');
+        return self::success($course->load('instructors'), 'Course retrieved successfully.', );
     }
 
     /**
@@ -46,13 +48,8 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course): \Illuminate\Http\JsonResponse
     {
-        $data = $request->validated();
-        $course->update($data);
-        if(isset($request->instructor_id)) {
-            $course->instructors()->sync($request->instructor_id);
-        }
-        $course->load('instructors');
-        return self::success($course, 'Course updated successfully.');
+        $course= $this->CoursesService->updateCourse($course , $request);
+        return self::success($course, 'Course updated successfully.', 201);
     }
 
     /**
@@ -62,5 +59,23 @@ class CourseController extends Controller
     {
         $course->delete();
         return self::success( 'Course deleted successfully.');
+    }
+
+    public function ShowSoftDeletedCourses(): \Illuminate\Http\JsonResponse
+    {
+        $softDeletedCourses = Course::onlyTrashed()->paginate(10);
+        return self::paginated($softDeletedCourses, 'Deleted Courses retrieved successfully.', 200);
+    }
+
+    public function restoreCourse($id): \Illuminate\Http\JsonResponse
+    {
+        $course = Course::withTrashed()->findOrFail($id);
+        $course->restore();
+        return self::success( $course,'Course restored successfully.', 201);
+    }
+    public function forceDeleteCourse(Course $course): \Illuminate\Http\JsonResponse
+    {
+        $course->forceDelete();
+        return self::success( 'Course deleted successfully.', 200);
     }
 }
