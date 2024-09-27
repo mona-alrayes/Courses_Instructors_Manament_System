@@ -17,7 +17,9 @@ class InstructorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->unique()->name(),
+            'experience' => $this->faker->numberBetween(1,30),
+            'specialty' => $this->faker->unique()->text(),
         ];
     }
 }
