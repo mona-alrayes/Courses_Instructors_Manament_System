@@ -53,7 +53,7 @@ class instructorServiceRequest extends FormRequest
             'max' => 'عدد محارف :attribute لا يجب أن يتجاوز :max محرفًا',
             'min' => 'حقل :attribute يجب أن يكون :min محارف على الأقل',
             'integer' => 'حقل :attribute يجب أن يكون رقماً',
-            'between' => 'عدد سنوات الخبرة يجب ان تكون :between'
+            'between' => 'عدد سنوات الخبرة يجب ان تكون :between  '
         ];
     }
 
@@ -75,8 +75,8 @@ class instructorServiceRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'name' => ucwords(strtolower($this->input('title'))),
-            'specialty' => ucwords(strtolower($this->input('author'))),
+            'name' => ucwords(strtolower($this->input('name'))),
+            'specialty' => ucwords(strtolower($this->input('specialty'))),
         ]);
     }
 

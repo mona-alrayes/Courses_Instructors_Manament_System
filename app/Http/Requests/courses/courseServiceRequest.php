@@ -50,8 +50,8 @@ class courseServiceRequest extends FormRequest
         return [
             'required' => 'حقل :attribute مطلوب',
             'string' => 'حقل :attribute يجب أن يكون نصًا وليس أي نوع آخر',
-            'max' => 'عدد محارف :attribute لا يجب أن يتجاوز max: محرفًا',
-            'min' => 'حقل :attribute يجب أن يكون min: محارف على الأقل',
+            'max' => 'عدد محارف :attribute لا يجب أن يتجاوز :max محرفًا',
+            'min' => 'حقل :attribute يجب أن يكون :min محارف على الأقل',
             'date_format' => 'حقل :attribute يجب أن يكون بصيغة تاريخ صحيحة مثل :format',
         ];
     }
@@ -73,10 +73,13 @@ class courseServiceRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'title' => ucwords(strtolower($this->input('title'))),
-            'author' => ucwords(strtolower($this->input('description'))),
-        ]);
+        if($this->input('title') || $this->input('description') !== null)
+        {
+            $this->merge([
+                'title' => ucwords(strtolower($this->input('title'))),
+                'description' => ucwords(strtolower($this->input('description'))),
+            ]);
+        }
     }
 
     /**

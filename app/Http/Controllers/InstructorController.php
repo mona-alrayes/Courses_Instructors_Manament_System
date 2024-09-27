@@ -30,17 +30,18 @@ class InstructorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Instructor $instructor)
+    public function show(Instructor $instructor): \Illuminate\Http\JsonResponse
     {
-        //
+        return self::success($instructor, 'instructor retrieved successfully');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInstructorRequest $request, Instructor $instructor)
+    public function update(UpdateInstructorRequest $request, Instructor $instructor): \Illuminate\Http\JsonResponse
     {
-        //
+        $instructor->update($request->validated());
+        return self::success($instructor, 'instructor updated successfully');
     }
 
     /**
@@ -48,6 +49,7 @@ class InstructorController extends Controller
      */
     public function destroy(Instructor $instructor)
     {
-        //
+        $instructor->delete();
+        return self::success($instructor, 'instructor deleted successfully');
     }
 }
